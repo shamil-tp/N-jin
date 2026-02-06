@@ -13,5 +13,6 @@
   },
   "dependencies": {
     "mongoose": "^9.1.6"
+    "axios": "^1.13.4"
   }
 }
