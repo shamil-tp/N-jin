@@ -1,10 +1,12 @@
+import { Routes, Route } from "react-router-dom";
+import SearchHome from "./pages/home";
 
-import SearchPage from './pages/SearchPage';
-
-function App() {
+export default function App() {
   return (
-  <SearchPage/>
+    <Routes>
+      <Route path="/" element={<SearchHome />} />
+      {/* Future routes */}
+      {/* <Route path="/about" element={<About />} /> */}
+    </Routes>
   );
 }
-
-export default App;
