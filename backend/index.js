@@ -1,25 +1,31 @@
+require('dotenv').config();
+
 const express = require("express");
-const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const Search = require("./models/Search");
-
-dotenv.config();
+const scanLAN = require("./lanScanner");
+const cors = require('cors')
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middleware
+app.use(cors({
+  origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175",process.env.FRONTEND_URL],
+}))
+app.use(express.urlencoded({extended:true}))
 app.use(express.json());
 
-// Connect DB
 connectDB();
 
-// Test route
-app.get("/", (req, res) => {
+app.get("/",(req, res) => {
   res.send("🚀 N-jin backend running");
 });
-
-// Sample insert route (for testing)
+app.post("/api/search",async (req,res)=>{
+  console.log(req.body)
+  const results = await Search.find( { $text: { $search: req.body.query } }, 
+    { score: { $meta: "textScore" } } ).sort({ score: { $meta: "textScore" } });
+  return res.status(200).json({success:true,results})
+})
 app.post("/index", async (req, res) => {
   try {
     const doc = await Search.create(req.body);
@@ -28,7 +34,6 @@ app.post("/index", async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
-const scanLAN = require("./lanScanner");
 
 app.get("/scan", async (req, res) => {
   console.log("Manual LAN scan triggered...");

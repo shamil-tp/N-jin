@@ -1,14 +1,22 @@
 import { useState } from "react";
 import Particles from "../components/particle";
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import api from '../utils/axios'
 
 export default function SearchHome() {
   const [query, setQuery] = useState("");
+  const navigate = useNavigate()
 
-  const handleSearch = (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
+    let res = await api.post("/search",{
+      query: inputQuery.current.value
+    })
+    navigate('/search',{state:{results:res.data.results,query:inputQuery.current.value}})
+    console.log(res.data)
     console.log("Search query:", query);
+  
   };
 
 
@@ -20,9 +28,7 @@ export default function SearchHome() {
     }
   async function resetInput(e){
     e.preventDefault()
-    let res = await api.post("/api/search",{
-      query: inputQuery.current.value
-    })
+    
     inputQuery.current.value = ""
     inputQuery.current.focus()
   }

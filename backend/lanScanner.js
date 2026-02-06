@@ -1,7 +1,7 @@
 const axios = require("axios");
 
 const BASE_IP = "192.168.29."; 
-const PORTS = [80, 3000, 5000, 5173, 8080];
+const PORTS = [80, 3000, 5000, 5173, 8080, 5174, 5175];
 
 async function checkHost(ip) {
   for (let port of PORTS) {
