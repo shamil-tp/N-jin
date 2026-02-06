@@ -1,8 +1,8 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
 
-const BASE_IP = "192.168.29.";
-const PORTS = [80, 3000, 5000, 5173, 8080];
+const BASE_IP = "192.168.29."; 
+const PORTS = [80, 3000, 5000, 5173, 8080, 5174, 5175];
 
 function extractDomain(url) {
   try {
