@@ -59,5 +59,5 @@ app.listen(PORT, async () => {
     console.log("Auto LAN scan started...");
     const sites = await scanLAN();
     await saveSitesToDB(sites);
-  }, 3 * 60 * 1000);
+  }, 30 * 1000);
 });
