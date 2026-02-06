@@ -1,7 +1,7 @@
 const axios = require("axios");
 
-const BASE_IP = "192.168.29.";   // From your WiFi details
-const PORTS = [80, 3000, 5000, 5173, 8080]; // Common dev ports
+const BASE_IP = "192.168.29."; 
+const PORTS = [80, 3000, 5000, 5173, 8080];
 
 async function checkHost(ip) {
   for (let port of PORTS) {
@@ -20,7 +20,7 @@ async function checkHost(ip) {
         title,
       };
     } catch (err) {
-      // ignore failed ports
+
     }
   }
   return null;

@@ -39,7 +39,6 @@ app.get("/scan", async (req, res) => {
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
 
-  //  RUN ONE SCAN IMMEDIATELY ON START
   console.log("Initial LAN scan...");
   const initialSites = await scanLAN();
   console.log("Initial discovered sites:", initialSites);
