@@ -1,5 +1,7 @@
 import { useState } from "react";
 import Particles from "../components/particle";
+import { useRef } from "react";
+import api from '../utils/axios'
 
 export default function SearchHome() {
   const [query, setQuery] = useState("");
@@ -8,6 +10,22 @@ export default function SearchHome() {
     e.preventDefault();
     console.log("Search query:", query);
   };
+
+
+    const inputQuery = useRef(null)
+
+    const handleChange = () => {
+      setQuery(inputQuery.current.value)
+      // console.log(inputQuery.current.value)
+    }
+  async function resetInput(e){
+    e.preventDefault()
+    let res = await api.post("/api/search",{
+      query: inputQuery.current.value
+    })
+    inputQuery.current.value = ""
+    inputQuery.current.focus()
+  }
 
   return (
     <div style={styles.page}>
@@ -36,10 +54,12 @@ export default function SearchHome() {
             type="text"
             placeholder="Search anything…"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            // onChange={(e) => setQuery(e.target.value)}
             style={styles.input}
+            ref={inputQuery}
+            onChange={handleChange}
           />
-          <button type="submit" style={styles.button}>
+          <button type="submit" style={styles.button} onSubmit={(e)=>{resetInput(e)}}>
             ⌕
           </button>
         </form>
