@@ -1,14 +1,21 @@
 {
-  "name": "n-jin",
+  "name": "n-jin-backend",
   "version": "1.0.0",
-  "description": "a custom search engine built with MongoDB, Express.js, and Node.js. It features a responsive interface using Bootstrap and EJS templates. This project demonstrates fundamental full-stack concepts, focusing on practical data indexing and retrieval logic to deliver accurate query results without unnecessary complexity",
+  "description": "Backend for N-jin, a custom search engine built with MongoDB, Express.js, and Node.js. Focused on data indexing and retrieval.",
+  "author": "shamil, sinan, ranfees",
   "license": "ISC",
-  "author": "shamil,sinan,ranfees",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node index",
-    "build":"npm i",
-    "test": "nodemon index"
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1",
+    "mongoose": "^9.1.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
   }
 }
