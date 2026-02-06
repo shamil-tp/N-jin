@@ -106,6 +106,7 @@ const styles = {
 
   tagline: {
     fontSize: "1.05rem",
+    fontWeight: "900",
     color: "#94a3b8",
     marginBottom: "2.8rem",
   },
@@ -143,6 +144,7 @@ const styles = {
     background: "linear-gradient(135deg, #6366f1, #22d3ee)",
     color: "#020617",
     fontWeight: 1000,
+    fontSize: "20px"
   },
 
   quickActions: {
