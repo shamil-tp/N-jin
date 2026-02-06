@@ -48,6 +48,7 @@ export default function SearchPage() {
               site={result.url}
               title={result.title}
               desc={result.content}
+              key={result._id}
             />
           )
         })}
