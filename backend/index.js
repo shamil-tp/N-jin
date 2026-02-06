@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const connectDB = require("./config/db");
 const Search = require("./models/Search");
+const saveSitesToDB = require("./services/indexer");
 
 dotenv.config();
 
@@ -33,21 +34,23 @@ const scanLAN = require("./lanScanner");
 app.get("/scan", async (req, res) => {
   console.log("Manual LAN scan triggered...");
   const sites = await scanLAN();
-  res.json(sites);
+
+  await saveSitesToDB(sites); 
+
+  res.json({ message: "Scan complete & indexed", count: sites.length });
 });
+
 
 app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
 
   console.log("Initial LAN scan...");
   const initialSites = await scanLAN();
-  console.log("Initial discovered sites:", initialSites);
+  await saveSitesToDB(initialSites);
 
   setInterval(async () => {
     console.log("Auto LAN scan started...");
     const sites = await scanLAN();
-
-    console.log("Discovered sites:", sites);
-
+    await saveSitesToDB(sites);
   }, 3 * 60 * 1000);
 });
