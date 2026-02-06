@@ -1,7 +1,7 @@
-import express from "express";
-import dotenv from "dotenv";
-import connectDB from "./config/db.js";
-import Search from "./models/Search.js";
+const express = require("express");
+const dotenv = require("dotenv");
+const connectDB = require("./config/db");
+const Search = require("./models/Search");
 
 dotenv.config();
 
@@ -12,11 +12,11 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 
 // Connect DB
-await connectDB();
+connectDB();
 
 // Test route
 app.get("/", (req, res) => {
-  res.send(" N-jin backend running");
+  res.send("🚀 N-jin backend running");
 });
 
 // Sample insert route (for testing)

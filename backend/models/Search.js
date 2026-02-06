@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const searchSchema = new mongoose.Schema(
     {
@@ -54,4 +54,4 @@ searchSchema.index({
     keywords: "text",
 });
 
-export default mongoose.model("Search", searchSchema);
+module.exports = mongoose.model("Search", searchSchema);
