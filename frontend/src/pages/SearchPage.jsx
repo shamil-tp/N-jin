@@ -1,6 +1,9 @@
 import "./SearchPage.css";
-import { useLocation, useNavigate } from "react-router-dom";
-import { Link } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "../utils/axios";
+
+
 
 function Result({ icon, site, title, desc }) {
   return (
@@ -16,21 +19,52 @@ function Result({ icon, site, title, desc }) {
 }
 
 export default function SearchPage() {
-  const navigate = useNavigate
-  const location = useLocation()
-  const {results, query} = location.state
-  console.log(results)
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  function nav(){
+  const [results, setResults] = useState([]);
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get("q");
+    const pageParam = params.get("page") || 1;
+    const limitParam = params.get("limit") || 10;
+
+    if (!q) return;
+
+    setQuery(q);
+    setPage(Number(pageParam));
+
+    const fetchResults = async () => {
+      try {
+        const res = await api.get(
+          `/search?q=${q}&page=${pageParam}&limit=${limitParam}`
+        );
+
+
+        setResults(res.data.results);
+        setTotalPages(res.data.totalPages);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchResults();
+  }, [location.search]);
+
+  function nav() {
     navigate('/')
   }
   return (
     <div className="search-page">
       <div className="top-bar">
         {/* <div className="logo" onClick={()=>{nav()}}>G</div> */}
-        <Link to="/" className="logo" style={{textDecoration:'none'}}>G</Link>
+        <Link to="/" className="logo" style={{ textDecoration: 'none' }}>G</Link>
         <div className="search-box">
-          <input type="text" defaultValue={query} />
+          <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} />
         </div>
       </div>
 
@@ -41,9 +75,9 @@ export default function SearchPage() {
           title="Latest Malayalam Movies 2026 | New Mollywood Movies"
           desc="Discover the latest Malayalam movies of 2026 and explore our best Mollywood movies list. Book tickets for exciting new releases."
         /> */}
-        {results.map((result)=>{
-         return (
-            <Result 
+        {results.map((result) => {
+          return (
+            <Result
               icon="https://img.icons8.com/color/48/ticket.png"
               site={result.url}
               title={result.title}
