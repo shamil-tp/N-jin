@@ -9,13 +9,17 @@ export default function SearchHome() {
   const navigate = useNavigate()
 
   const handleSearch = async (e) => {
-    e.preventDefault();
+    try{
+      e.preventDefault();
     let res = await api.post("/search",{
       query: inputQuery.current.value
     })
     navigate('/search',{state:{results:res.data.results,query:inputQuery.current.value}})
     console.log(res.data)
     console.log("Search query:", query);
+    }catch(e){
+      console.log(e)
+    }
   
   };
 

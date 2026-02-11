@@ -1,5 +1,5 @@
 import "./SearchPage.css";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 function Result({ icon, site, title, desc }) {
@@ -16,14 +16,14 @@ function Result({ icon, site, title, desc }) {
 }
 
 export default function SearchPage() {
-  const navigate = useNavigate
+  // const navigate = useNavigate
   const location = useLocation()
   const {results, query} = location.state
   console.log(results)
 
-  function nav(){
-    navigate('/')
-  }
+  // function nav(){
+  //   navigate('/')
+  // }
   return (
     <div className="search-page">
       <div className="top-bar">
