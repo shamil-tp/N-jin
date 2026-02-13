@@ -55,6 +55,26 @@ export default function SearchPage() {
     fetchResults();
   }, [location.search]);
 
+
+  const handleNext = () => {
+    if (page < totalPages) {
+      navigate(`/search?q=${query}&page=${page + 1}&limit=10`);
+    }
+  };
+
+  const handlePrev = () => {
+    if (page > 1) {
+      navigate(`/search?q=${query}&page=${page - 1}&limit=10`);
+    }
+  };
+
+  const handleSearch = (e) => {
+  if (e.key === "Enter") {
+    navigate(`/search?q=${query}&page=1&limit=10`);
+  }
+};
+
+
   function nav() {
     navigate('/')
   }
@@ -64,7 +84,7 @@ export default function SearchPage() {
         {/* <div className="logo" onClick={()=>{nav()}}>G</div> */}
         <Link to="/" className="logo" style={{ textDecoration: 'none' }}>G</Link>
         <div className="search-box">
-          <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} />
+      <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={handleSearch} />
         </div>
       </div>
 
@@ -88,6 +108,18 @@ export default function SearchPage() {
         })}
 
       </div>
+      <div className="pagination">
+        <button onClick={handlePrev} disabled={page === 1}>
+          &lt;
+        </button>
+
+        <span>Page {page} of {totalPages}</span>
+
+        <button onClick={handleNext} disabled={page === totalPages}>
+          &gt;
+        </button>
+      </div>
+
     </div>
   );
 }
