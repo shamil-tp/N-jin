@@ -59,7 +59,6 @@ app.get("/api/search", async (req, res) => {
     q = normalizeQuery(q);
     q = removeStopWords(q);
 
-    //Check if query becomes empty after cleaning
 
     if (q.length < 2) {
       return res.status(400).json({ message: "Query too short" });
@@ -140,21 +139,21 @@ app.get('/scan', async (req, res) => {
 // 		await saveSitesToDB(sites);
 // 	}, 30 * 1000);
 // });
+
 app.listen(PORT, () => {
-	console.log(`Server running on port http://localhost:${PORT}`);
+  console.log(`Server running on port http://localhost:${PORT}`);
 
-	// Start auto scanning immediately
-	setInterval(async () => {
-		console.log('Auto LAN scan started...');
-		const sites = await scanLAN();
-		await saveSitesToDB(sites);
-	}, 30 * 1000);
-
-	// Run initial scan separately (does NOT block interval)
-	(async () => {
-		console.log('Initial LAN scan started...');
-		const initialSites = await scanLAN();
-		await saveSitesToDB(initialSites);
-		console.log('Initial LAN scan finished');
-	})();
+  const runScan = async () => {
+    try {
+      console.log("Auto LAN scan started..."); 
+      const sites = await scanLAN();
+      await saveSitesToDB(sites);
+      console.log("Auto LAN scan finished");
+    } catch (err) {
+      console.error("Scan error:", err.message);
+    }
+    setTimeout(runScan,10000);
+  };
+  runScan();
 });
+
