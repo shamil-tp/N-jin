@@ -1,6 +1,6 @@
 .search-page {
   background-color: #202124;
-  min-height: 100vh;
+  height: max-content;
   color: #e8eaed;
   font-family: Arial, Helvetica, sans-serif;
 }
