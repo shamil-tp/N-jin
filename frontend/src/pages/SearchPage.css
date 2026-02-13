@@ -91,7 +91,8 @@
 	line-height: 1.6;
 	max-width: 600px;
 }
-/* sublinks */.result .sublinks {
+/* sublinks */
+.result .sublinks {
 	margin-top: 8px;
 	margin-left: 16px; /* indent like Google */
 	list-style: none;
@@ -115,34 +116,33 @@
 .result .sublinks .sub-desc {
 	font-size: 12px;
 	color: #bdc1c6;
-	margin-left: 16px; /* extra indent for snippet */
+	margin-left: 16px;
 	line-height: 1.4;
 }
 
 .pagination {
-  margin: 40px 0;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  justify-content: center;
+	margin: 40px 0;
+	display: flex;
+	align-items: center;
+	gap: 20px;
+	justify-content: center;
 }
 
 .pagination button {
-  background: #303134;
-  color: #e8eaed;
-  border: 1px solid #3c4043;
-  padding: 8px 18px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: 0.2s;
+	background: #303134;
+	color: #e8eaed;
+	border: 1px solid #3c4043;
+	padding: 8px 18px;
+	border-radius: 20px;
+	cursor: pointer;
+	transition: 0.2s;
 }
 
 .pagination button:hover:not(:disabled) {
-  background: #3c4043;
+	background: #3c4043;
 }
 
 .pagination button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+	opacity: 0.4;
+	cursor: not-allowed;
 }
-
