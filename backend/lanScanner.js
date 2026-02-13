@@ -32,23 +32,17 @@ function generateTitleKeywords(title) {
 
 	const clean = title.toLowerCase().replace(/[^a-z0-9\s]/g, '');
 	const words = clean.split(/\s+/).filter(Boolean);
+	const keywords = new Set();
 
-	let keywords = new Set();
-
-	// Add individual words
 	words.forEach((w) => keywords.add(w));
-
-	// Add full title
 	keywords.add(clean);
 
-	// Add combinations
 	if (words.length > 1) {
 		for (let i = 0; i < words.length - 1; i++) {
 			keywords.add(words[i] + ' ' + words[i + 1]);
 		}
 	}
 
-	// 🔥 Add common synonyms
 	const synonymMap = {
 		login: ['sign in', 'signin', 'log in'],
 		logout: ['sign out', 'signout'],
@@ -65,61 +59,131 @@ function generateTitleKeywords(title) {
 	return Array.from(keywords);
 }
 
-async function checkHost(ip) {
-	const foundSites = [];
+// Crawl
+async function crawlPage(url, maxSublinks = 5) {
+	try {
+		const res = await axios.get(url, { timeout: 1500 });
+		const $ = cheerio.load(res.data);
 
-	await Promise.all(
-		PORTS.map(async (port) => {
+		$('script, style, noscript').remove();
+
+		// Main page title and content
+		const title = $('title').text().trim() || 'No Title';
+		const content = $('body').text().replace(/\s+/g, ' ').trim();
+		const metaKeywords = extractKeywords($);
+		const titleKeywords = generateTitleKeywords(title);
+		const keywords = [...new Set([...metaKeywords, ...titleKeywords])];
+
+		// Normalize main URL
+		const mainNormalized = url.replace(/\/$/, '');
+		const baseOrigin = new URL(url).origin;
+
+		// Deduplicate and clean sublinks
+		const rawLinks = $('a[href]')
+			.map((_, el) => $(el).attr('href'))
+			.get()
+			.filter(Boolean);
+
+		const sublinks = [];
+		const seen = new Set();
+		seen.add(mainNormalized);
+
+		for (const href of rawLinks) {
 			try {
-				const url = `http://${ip}:${port}`;
-				const res = await axios.get(url, { timeout: 1500 });
+				const linkUrl = new URL(href, url).href;
+				const normalized = linkUrl.replace(/\/$/, '');
 
-				const $ = cheerio.load(res.data);
-				const title = $('title').text().trim() || 'No Title';
+				// Only internal links
+				if (!normalized.startsWith(baseOrigin)) continue;
 
-				$('script, style, noscript').remove();
-				const content = $('body').text().replace(/\s+/g, ' ').trim();
+				// Skip duplicates and main page
+				if (seen.has(normalized)) continue;
+				seen.add(normalized);
 
-				const metaKeywords = extractKeywords($);
-				const titleKeywords = generateTitleKeywords(title);
-				const keywords = [...new Set([...metaKeywords, ...titleKeywords])];
+				const subRes = await axios.get(normalized, { timeout: 1500 });
+				const $$ = cheerio.load(subRes.data);
+				$$('script, style, noscript').remove();
 
-				foundSites.push({
-					url,
-					domain: extractDomain(url),
-					ip,
-					port,
-					title,
-					content: content.slice(0, 3000),
-					keywords,
-					indexedAt: new Date(),
+				let subTitle = $$('title').text().trim() || normalized.split('/').pop() || 'No Title';
+
+				subTitle = subTitle.replace(/^Server\s*\d+\s*\|\s*/, '');
+
+				const subContent = $$('body').text().replace(/\s+/g, ' ').trim().slice(0, 200);
+
+				sublinks.push({
+					url: normalized,
+					title: subTitle,
+					content: subContent,
 				});
-			} catch (err) {
-				// ignore closed ports
-			}
-		})
-	);
 
-	return foundSites;
+				if (sublinks.length >= maxSublinks) break;
+			} catch {}
+		}
+
+		return {
+			main: {
+				url: mainNormalized,
+				title,
+				content: content.slice(0, 3000),
+				keywords,
+				domain: extractDomain(url),
+				indexedAt: new Date(),
+			},
+			sublinks,
+		};
+	} catch {
+		return null;
+	}
 }
 
+// Check all ports
+async function checkHost(ip) {
+	const sites = [];
+	const seen = new Set();
 
+	for (const port of PORTS) {
+		const url = `http://${ip}:${port}`;
+		const mainPage = await crawlPage(url);
+		if (!mainPage) continue;
+
+		const id = `${ip}:${port}`; // unique per server instance
+		if (seen.has(id)) continue;
+		seen.add(id);
+
+		sites.push({
+			main: mainPage.main,
+			sublinks: mainPage.sublinks || [],
+		});
+	}
+
+	return sites.length > 0 ? sites : null;
+}
+
+// Scan entire LAN with concurrency
 async function scanLAN() {
-	let found = [];
-	const limit = pLimit(30); // increase concurrency
+	const found = [];
+	const limit = pLimit(30);
 	const promises = [];
 
 	for (let i = 1; i < 255; i++) {
 		const ip = BASE_IP + i;
-
 		promises.push(
 			limit(async () => {
 				const sites = await checkHost(ip);
-				if (sites.length > 0) {
-					sites.forEach((site) => {
-						console.log('Website indexed:', site.url);
-						found.push(site);
-					});
+				if (sites) {
+					for (const site of sites) {
+						const flatSite = {
+							url: site.main.url,
+							title: site.main.title,
+							content: site.main.content,
+							keywords: site.main.keywords,
+							domain: site.main.domain,
+							indexedAt: site.main.indexedAt,
+							sublinks: site.sublinks || [],
+						};
+						console.log('Indexed:', flatSite.url, '| Sublinks:', flatSite.sublinks.length);
+						found.push(flatSite);
+					}
 				}
 			})
 		);
