@@ -1,93 +1,103 @@
-import "./SearchPage.css";
-import { useLocation, useNavigate, Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import api from "../utils/axios";
+import './SearchPage.css';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import api from '../utils/axios';
 
+function Result({ icon, site, title, desc, sublinks }) {
+	const truncate = (text, length) => (text?.length > length ? text.slice(0, length) + '…' : text);
 
+	return (
+		<div className="result">
+			<div className="url">
+				<img className="site-icon" src={icon} alt="" />
+				{site}
+			</div>
+			<a href={site}>{title}</a>
+			<div className="desc">{truncate(desc, 200)}</div>
 
-function Result({ icon, site, title, desc }) {
-  return (
-    <div className="result">
-      <div className="url">
-        <img className="site-icon" src={icon} alt="" />
-        {site}
-      </div>
-      <a href={site}>{title}</a>
-      <div className="desc">{desc}</div>
-    </div>
-  );
+			{sublinks?.length > 0 && (
+				<ul className="sublinks">
+					{sublinks.map((link) => (
+						<li key={link.url}>
+							<a href={link.url}>{link.title}</a>
+							{link.content && <div className="sub-desc">{truncate(link.content, 200)}</div>}
+						</li>
+					))}
+				</ul>
+			)}
+		</div>
+	);
 }
 
 export default function SearchPage() {
-  const navigate = useNavigate();
-  const location = useLocation();
+	const navigate = useNavigate();
+	const location = useLocation();
 
-  const [results, setResults] = useState([]);
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+	const [results, setResults] = useState([]);
+	const [query, setQuery] = useState('');
+	const [page, setPage] = useState(1);
+	const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const q = params.get("q");
-    const pageParam = params.get("page") || 1;
-    const limitParam = params.get("limit") || 10;
+	useEffect(() => {
+		const params = new URLSearchParams(location.search);
+		const q = params.get('q');
+		const pageParam = params.get('page') || 1;
+		const limitParam = params.get('limit') || 10;
 
-    if (!q) return;
+		if (!q) return;
 
-    setQuery(q);
-    setPage(Number(pageParam));
+		setQuery(q);
+		setPage(Number(pageParam));
 
-    const fetchResults = async () => {
-      try {
-        const res = await api.get(
-          `/search?q=${q}&page=${pageParam}&limit=${limitParam}`
-        );
+		const fetchResults = async () => {
+			try {
+				const res = await api.get(`/search?q=${q}&page=${pageParam}&limit=${limitParam}`);
 
+				setResults(res.data.results);
+				setTotalPages(res.data.totalPages);
+			} catch (err) {
+				console.error(err);
+			}
+		};
 
-        setResults(res.data.results);
-        setTotalPages(res.data.totalPages);
-      } catch (err) {
-        console.error(err);
-      }
-    };
+		fetchResults();
+	}, [location.search]);
 
-    fetchResults();
-  }, [location.search]);
+	function nav() {
+		navigate('/');
+	}
+	return (
+		<div className="search-page">
+			<div className="top-bar">
+				{/* <div className="logo" onClick={()=>{nav()}}>G</div> */}
+				<Link to="/" className="logo" style={{ textDecoration: 'none' }}>
+					G
+				</Link>
+				<div className="search-box">
+					<input type="text" value={query} onChange={(e) => setQuery(e.target.value)} />
+				</div>
+			</div>
 
-  function nav() {
-    navigate('/')
-  }
-  return (
-    <div className="search-page">
-      <div className="top-bar">
-        {/* <div className="logo" onClick={()=>{nav()}}>G</div> */}
-        <Link to="/" className="logo" style={{ textDecoration: 'none' }}>G</Link>
-        <div className="search-box">
-          <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} />
-        </div>
-      </div>
-
-      <div className="results">
-        {/* <Result
+			<div className="results">
+				{/* <Result
           icon="https://img.icons8.com/color/48/ticket.png"
           site="bookmyshow.com"
           title="Latest Malayalam Movies 2026 | New Mollywood Movies"
           desc="Discover the latest Malayalam movies of 2026 and explore our best Mollywood movies list. Book tickets for exciting new releases."
         /> */}
-        {results.map((result) => {
-          return (
-            <Result
-              icon="https://img.icons8.com/color/48/ticket.png"
-              site={result.url}
-              title={result.title}
-              desc={result.content}
-              key={result._id}
-            />
-          )
-        })}
-
-      </div>
-    </div>
-  );
+				{results.map((result) => {
+					return (
+						<Result
+							icon="https://img.icons8.com/color/48/ticket.png"
+							site={result.url}
+							title={result.title}
+							desc={result.content}
+							sublinks={result.sublinks}
+							key={result._id}
+						/>
+					);
+				})}
+			</div>
+		</div>
+	);
 }

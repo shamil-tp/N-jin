@@ -127,30 +127,15 @@ app.get('/scan', async (req, res) => {
 	res.json({ message: 'Scan complete & indexed', count: sites.length });
 });
 
-// app.listen(PORT, async () => {
-// 	console.log(`Server running on port http://localhost:${PORT}`);
-
-// 	console.log('Initial LAN scan...');
-// 	const initialSites = await scanLAN();
-// 	await saveSitesToDB(initialSites);
-
-// 	setInterval(async () => {
-// 		console.log('Auto LAN scan started...');
-// 		const sites = await scanLAN();
-// 		await saveSitesToDB(sites);
-// 	}, 30 * 1000);
-// });
 app.listen(PORT, () => {
 	console.log(`Server running on port http://localhost:${PORT}`);
 
-	// Start auto scanning immediately
 	setInterval(async () => {
 		console.log('Auto LAN scan started...');
 		const sites = await scanLAN();
 		await saveSitesToDB(sites);
 	}, 30 * 1000);
 
-	// Run initial scan separately (does NOT block interval)
 	(async () => {
 		console.log('Initial LAN scan started...');
 		const initialSites = await scanLAN();
