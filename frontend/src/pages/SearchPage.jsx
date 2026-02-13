@@ -69,10 +69,10 @@ export default function SearchPage() {
   };
 
   const handleSearch = (e) => {
-  if (e.key === "Enter") {
-    navigate(`/search?q=${query}&page=1&limit=10`);
-  }
-};
+    if (e.key === "Enter") {
+      navigate(`/search?q=${query}&page=1&limit=10`);
+    }
+  };
 
 
   function nav() {
@@ -84,7 +84,7 @@ export default function SearchPage() {
         {/* <div className="logo" onClick={()=>{nav()}}>G</div> */}
         <Link to="/" className="logo" style={{ textDecoration: 'none' }}>G</Link>
         <div className="search-box">
-      <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={handleSearch} />
+          <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={handleSearch} />
         </div>
       </div>
 
@@ -108,17 +108,20 @@ export default function SearchPage() {
         })}
 
       </div>
-      <div className="pagination">
-        <button onClick={handlePrev} disabled={page === 1}>
-          &lt;
-        </button>
 
-        <span>Page {page} of {totalPages}</span>
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button onClick={handlePrev} disabled={page === 1}>
+            &lt;
+          </button>
 
-        <button onClick={handleNext} disabled={page === totalPages}>
-          &gt;
-        </button>
-      </div>
+          <span>Page {page} of {totalPages}</span>
+
+          <button onClick={handleNext} disabled={page === totalPages}>
+            &gt;
+          </button>
+        </div>
+      )}
 
     </div>
   );

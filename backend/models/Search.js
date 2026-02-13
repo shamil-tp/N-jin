@@ -1,57 +1,64 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const searchSchema = new mongoose.Schema(
-    {
-        url: {
-            type: String,
-            required: true,
-            unique: true,
-            trim: true,
-        },
+	{
+		url: {
+			type: String,
+			required: true,
+			unique: true,
+			trim: true,
+		},
 
-        domain: {
-            type: String,
-            required: true,
-            index: true,
-            trim: true,
-        },
+		domain: {
+			type: String,
+			required: true,
+			index: true,
+			trim: true,
+		},
 
-        ip: {
-            type: String,
-            required: true,
-            index: true,
-        },
+		ip: {
+			type: String,
+			required: true,
+			index: true,
+		},
 
-        title: {
-            type: String,
-            trim: true,
-        },
+		title: {
+			type: String,
+			trim: true,
+		},
 
-        content: {
-            type: String,
-        },
+		content: {
+			type: String,
+		},
 
-        keywords: {
-            type: [String],
-            index: true,
-        },
+		keywords: {
+			type: [String],
+			index: true,
+		},
+		sublinks: [
+			{
+				url: { type: String, required: true },
+				title: { type: String, trim: true },
+				content: { type: String },
+			},
+		],
 
-        indexedAt: {
-            type: Date,
-            default: Date.now,
-            index: true,
-        },
-    },
-    {
-        timestamps: true, // adds createdAt & updatedAt
-    }
+		indexedAt: {
+			type: Date,
+			default: Date.now,
+			index: true,
+		},
+	},
+	{
+		timestamps: true, // adds createdAt & updatedAt
+	}
 );
 
 // Text index for search (title + content)
 searchSchema.index({
-    title: "text",
-    content: "text",
-    keywords: "text",
+	title: 'text',
+	content: 'text',
+	keywords: 'text',
 });
 
-module.exports = mongoose.model("Search", searchSchema);
+module.exports = mongoose.model('Search', searchSchema);
